@@ -17,4 +17,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('/categories', 'CategoriesController');
+
+Route::group([
+    'middleware' => ['auth.jwt']
+], function () {
+    Route::resource('categories', 'CategoriesController');
+});
+
+Route::post('login', 'UsersController@login');
+Route::post('logout', 'UsersController@logout');

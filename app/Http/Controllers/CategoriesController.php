@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Validator;
 
 /**
  * Class CategoriesController
@@ -39,11 +40,14 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        Category::create($request->all());
-
-        return response()->json([
-           'created' => true
-        ], 201);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return ['status' => -1, 'msg' => $validator->errors()];
+        }
+        $result = Category::create($request->all());
+        return ['status' => 0, 'id' => $result->id];
     }
 
     /**
@@ -61,11 +65,12 @@ class CategoriesController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
+     * @param  Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Category $category)
     {
-        //
+        return $category;
     }
 
     /**
@@ -84,10 +89,11 @@ class CategoriesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Category  $category
      */
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return ['status' => 0];
     }
 }
